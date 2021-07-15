@@ -31,6 +31,8 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 	String selected;
 	Integer pathCostBFS = 0, stepsBFS = 0;
 	
+	JPanel bfsPanel;
+	
 	
 
 	private JPanel contentPane;
@@ -72,8 +74,9 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		lblConnections.setBounds(10, 10, 970, 870);
 		mapPanel.add(lblConnections);
 		
-		JPanel bfsPanel = new JPanel();
+		bfsPanel = new JPanel();
 		tabbedPane.addTab("Breadth-First Search", null, bfsPanel, null);
+		bfsPanel.setLayout(null);
 		
 		JPanel dfsPanel = new JPanel();
 		tabbedPane.addTab("Depth-First Search", null, dfsPanel, null);
@@ -219,6 +222,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 	}
 	
 	public Queue BFS() {
+		bfsPanel.removeAll();
 		Queue goalPath = new LinkedList();
 		Queue frontier = new LinkedList();
 		System.out.println("Start");
@@ -245,14 +249,38 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 					if(current.equalsIgnoreCase("Bucharest")) {
 						goalPath.add(current);
 						visited.add(current);
+						
 						System.out.println("\nMY PATH:");
 						while(!goalPath.isEmpty())
 							System.out.println(goalPath.remove().toString());
 						System.out.println("Stop here");
 						
+						JLabel lblTemp = new JLabel("Visited cities in order visited: ");
+						lblTemp.setVerticalAlignment(SwingConstants.TOP);
+						lblTemp.setHorizontalAlignment(SwingConstants.LEFT);
+						lblTemp.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblTemp.setBounds(10, 10, 970, 870);
+						bfsPanel.add(lblTemp);
+						
+						
+						
 						System.out.println("\nMY VISITS:");
 						System.out.println(visited.toString());
 						System.out.println("Stop");
+						
+						
+						JLabel lblTemp2 = new JLabel(visited.get(0));
+						lblTemp2.setVerticalAlignment(SwingConstants.TOP);
+						lblTemp2.setHorizontalAlignment(SwingConstants.LEFT);
+						lblTemp2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+						lblTemp2.setBounds(10, 70, 970, 870);
+						for(int i = 1; i < visited.size(); i++)
+							lblTemp2.setText(lblTemp2.getText().toString() + " -> " + visited.get(i));
+							
+						bfsPanel.add(lblTemp2);
+						bfsPanel.repaint();
+						
+						
 						return goalPath;
 					}
 					//frontier.add(current);
