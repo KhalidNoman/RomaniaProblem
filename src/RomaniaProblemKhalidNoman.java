@@ -7,18 +7,29 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTabbedPane;
 import javax.swing.JComboBox;
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JLabel;
 import java.awt.Font;
+import java.awt.Image;
+
 import javax.swing.SwingConstants;
+import javax.swing.border.MatteBorder;
+import java.awt.Color;
 
 public class RomaniaProblemKhalidNoman extends JFrame {
 	//Variables to be used throughout
@@ -36,6 +47,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 	
 
 	private JPanel contentPane;
+	private JTable tblConnections;
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -49,7 +61,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		});
 	}
 	
-	public RomaniaProblemKhalidNoman() {
+	public RomaniaProblemKhalidNoman() throws IOException {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1500, 1000);
 		this.setTitle("Khalid Noman Romania Problem");
@@ -99,6 +111,15 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		});
 		goBtn.setBounds(250, 10, 89, 23);
 		contentPane.add(goBtn);
+		
+		BufferedImage picture = ImageIO.read(new File("imgs/map.png"));
+		Image resPic = picture.getScaledInstance(850, 500, Image.SCALE_DEFAULT);
+		JLabel lblImage = new JLabel();
+		lblImage.setIcon(new ImageIcon(resPic));
+		lblImage.setBounds(1050, 50, 850, 500);
+		contentPane.add(lblImage);
+		
+		
 		
 		
 		
@@ -175,8 +196,21 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 				adjMatrix[cityNames.Zerind.ordinal()][cityNames.Oradea.ordinal()] = 71;
 				adjMatrix[cityNames.Zerind.ordinal()][cityNames.Arad.ordinal()] = 75;
 		//End of connections 
+		
+		DefaultTableModel model = new DefaultTableModel();
+		tblConnections = new JTable(model);
+		tblConnections.setBorder(new MatteBorder(1, 1, 1, 1, (Color) new Color(0, 0, 0)));
+		model.insertRow(0, cities);
+		model.addColumn(0, cities);
+		for(int i = 1; i < 21; i++)
+			model.addColumn(i, adjMatrix[i-1]);
+		tblConnections.setEnabled(false);
+		tblConnections.setBackground(getBackground());
+		tblConnections.setBounds(1050, 600, 850, 400);
+		contentPane.add(tblConnections);
+				
 		for(int i = 0; i < 20; i++) {
-			JLabel lblTemp = new JLabel(cities[i] + " :");
+			JLabel lblTemp = new JLabel(i + " " + cities[i] + " :");
 			lblTemp.setVerticalAlignment(SwingConstants.TOP);
 			lblTemp.setHorizontalAlignment(SwingConstants.LEFT);
 			lblTemp.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -221,17 +255,33 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		   RimnicuVilcea, Sibiu, Timisoara, Urziceni, Vaslui, Zerind;
 	}
 	
+	public class node{
+		String parent;
+		String child;
+		
+		public node(String p, String c) {
+			parent = p;
+			child = c;
+		}
+	}
+	
 	public Queue BFS() {
 		bfsPanel.removeAll();
 		Queue goalPath = new LinkedList();
 		Queue frontier = new LinkedList();
-		System.out.println("Start");
+		int steps = 0;
+		int score = 0;
 		
 		ArrayList<String> visited = new ArrayList<String>();
+		ArrayList<node> family = new ArrayList<node>();
+		String parent;
+		
+		
 		String current = selected;
 		//visited.add(current);
 		//goalPath.add(current);
 		frontier.add(current);
+		family.add(new node("", current));
 		
 		if(current.equalsIgnoreCase("Bucharest")) {
 			return goalPath;
@@ -239,12 +289,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 			while(!frontier.isEmpty()) {
 				System.out.println("Front " + current);
 				current = frontier.remove().toString();
-				/*for(int i = 0; i < 20; i++) {
-					if(adjMatrix[Arrays.asList(cities).indexOf(current)][i] == 1)
-						frontier.add(cities[i]);
-				}*/
-				/*visited.add(current);
-				goalPath.add(current);*/
+
 				if(!visited.contains(current) && !frontier.contains(current)) {
 					if(current.equalsIgnoreCase("Bucharest")) {
 						goalPath.add(current);
@@ -253,39 +298,107 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 						System.out.println("\nMY PATH:");
 						while(!goalPath.isEmpty())
 							System.out.println(goalPath.remove().toString());
-						System.out.println("Stop here");
 						
-						JLabel lblTemp = new JLabel("Visited cities in order visited: ");
-						lblTemp.setVerticalAlignment(SwingConstants.TOP);
-						lblTemp.setHorizontalAlignment(SwingConstants.LEFT);
-						lblTemp.setFont(new Font("Tahoma", Font.PLAIN, 30));
-						lblTemp.setBounds(10, 10, 970, 870);
-						bfsPanel.add(lblTemp);
+						JLabel lblVisit = new JLabel("Visited cities in order visited: ");
+						lblVisit.setVerticalAlignment(SwingConstants.TOP);
+						lblVisit.setHorizontalAlignment(SwingConstants.LEFT);
+						lblVisit.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblVisit.setBounds(10, 10, 970, 870);
+						bfsPanel.add(lblVisit);
 						
 						
 						
 						System.out.println("\nMY VISITS:");
 						System.out.println(visited.toString());
-						System.out.println("Stop");
 						
 						
-						JLabel lblTemp2 = new JLabel(visited.get(0));
-						lblTemp2.setVerticalAlignment(SwingConstants.TOP);
-						lblTemp2.setHorizontalAlignment(SwingConstants.LEFT);
-						lblTemp2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-						lblTemp2.setBounds(10, 70, 970, 870);
+						JTextArea lblVisit2 = new JTextArea(visited.get(0));
+						lblVisit2.setBackground(getBackground());
+						lblVisit2.setLineWrap(true);
+						lblVisit2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+						lblVisit2.setBounds(10, 60, 970, 150);
 						for(int i = 1; i < visited.size(); i++)
-							lblTemp2.setText(lblTemp2.getText().toString() + " -> " + visited.get(i));
-							
-						bfsPanel.add(lblTemp2);
+							lblVisit2.setText(lblVisit2.getText().toString() + " -> " + visited.get(i));
+						bfsPanel.add(lblVisit2);
+						
+						bfsPanel.repaint();
+						
+						System.out.println("Goal path: ");
+						int index = 0;
+						for(int i = 0; i < family.size(); i++) {
+							if(family.get(i).child.equalsIgnoreCase("Bucharest"))
+								index = i;
+						}
+						int i = index;
+						int j = 0;
+						ArrayList<String> myList = new ArrayList<String>();
+						myList.add(family.get(index).child);
+						while(i != 0) {
+							if(family.get(i).parent.equalsIgnoreCase(family.get(j).child)) {
+								i = j; j = 0;
+								myList.add(family.get(i).child);
+							}
+							else j++;
+						}
+						
+						JLabel lblGoal = new JLabel("Straight path from origin to goal: ");
+						lblGoal.setVerticalAlignment(SwingConstants.TOP);
+						lblGoal.setHorizontalAlignment(SwingConstants.LEFT);
+						lblGoal.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblGoal.setBounds(10, 250, 970, 50);
+						bfsPanel.add(lblGoal);
+						
+						JTextArea lblGoal2 = new JTextArea();
+						lblGoal2.setBackground(getBackground());
+						lblGoal2.setLineWrap(true);
+						lblGoal2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+						lblGoal2.setBounds(10, 300, 970, 150);
+						
+						for(int x = 0; x < myList.size()-1; x++) {
+							int from = 0, to = 0;
+							for(int y = 0; y < cities.length; y++) {
+								if(myList.get(x).equalsIgnoreCase(cities[y]))
+									from = y;
+								else if(myList.get(x+1).equalsIgnoreCase(cities[y]))
+									to = y;	
+							}
+							score = score + adjMatrix[from][to];
+						}
+						
+						for(int x = myList.size()-1; x >= 0; x--) {
+							if(myList.get(x).equalsIgnoreCase("Bucharest")) {
+								System.out.println(myList.get(x));
+								lblGoal2.setText(lblGoal2.getText().toString() + myList.get(x));
+							}else {
+								System.out.print(myList.get(x) + " -> ");
+								lblGoal2.setText(lblGoal2.getText().toString() + myList.get(x) + " -> ");
+							}
+						}
+						bfsPanel.add(lblGoal2);
+						
+						JLabel lblSteps = new JLabel("Steps: " + steps);
+						lblSteps.setVerticalAlignment(SwingConstants.TOP);
+						lblSteps.setHorizontalAlignment(SwingConstants.LEFT);
+						lblSteps.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblSteps.setBounds(10, 500, 970, 50);
+						bfsPanel.add(lblSteps);
+						
+						JLabel lblScore = new JLabel("Score: " + score);
+						lblScore.setVerticalAlignment(SwingConstants.TOP);
+						lblScore.setHorizontalAlignment(SwingConstants.LEFT);
+						lblScore.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblScore.setBounds(10, 600, 970, 50);
+						bfsPanel.add(lblScore);
+						
 						bfsPanel.repaint();
 						
 						
 						return goalPath;
 					}
-					//frontier.add(current);
+					steps++;
 					for(int i = 0; i < 20; i++) {
 						if(adjMatrix[Arrays.asList(cities).indexOf(current)][i] > 0 ) {
+							family.add(new node(current, cities[i]));
 							System.out.println("Adding " + cities[i] + " parent: " + current);
 							frontier.add(cities[i]);
 						}
