@@ -43,6 +43,8 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 	Integer pathCostBFS = 0, stepsBFS = 0;
 	
 	JPanel bfsPanel;
+	JPanel dfsPanel;
+	JPanel idsPanel;
 	
 	
 
@@ -90,10 +92,10 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		tabbedPane.addTab("Breadth-First Search", null, bfsPanel, null);
 		bfsPanel.setLayout(null);
 		
-		JPanel dfsPanel = new JPanel();
+		dfsPanel = new JPanel();
 		tabbedPane.addTab("Depth-First Search", null, dfsPanel, null);
 		
-		JPanel idsPanel = new JPanel();
+		idsPanel = new JPanel();
 		tabbedPane.addTab("Iterative-Deepening Search", null, idsPanel, null);
 		
 		JComboBox selectDrop = new JComboBox(cities);
@@ -107,6 +109,8 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 				if(selected.equalsIgnoreCase("Bucharest"))
 					JOptionPane.showMessageDialog(null, "Starting point cannot be the same as destination!");
 				BFS();
+				DFS();
+				IDS();
 			}
 		});
 		goBtn.setBounds(250, 10, 89, 23);
@@ -119,11 +123,6 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		lblImage.setBounds(1050, 50, 850, 500);
 		contentPane.add(lblImage);
 		
-		
-		
-		
-		
-		/*********************************Setup************************************/
 		for(int i = 0; i < 20; i++) 
 			for(int j = 0; j < 20; j++)
 				adjMatrix[i][j] = 0;
@@ -216,7 +215,6 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 			lblTemp.setFont(new Font("Tahoma", Font.PLAIN, 20));
 			lblTemp.setBounds(10, i*35+100, 970, 870);
 			mapPanel.add(lblTemp);
-			//lblConnections.setText(String.format("<html>" +lblConnections.getText().toString() + "%-14s : ", cities[i]));
 			int space = 1;
 			for(int j = 0; j < 20; j++) {
 				if(adjMatrix[i][j] > 0) {
@@ -227,14 +225,10 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 					lblTemp2.setFont(new Font("Tahoma", Font.PLAIN, 20));
 					lblTemp2.setBounds(150*space, i*35+100, 970, 870);
 					mapPanel.add(lblTemp2);
-					//lblConnections.setText(String.format(lblConnections.getText().toString() + "%-14s", cityNames.values()[j]));
-					//System.out.printf("%-14s ", cityNames.values()[j]);
 				}
 			}
 			space = 1;
-			//lblConnections.setText(lblConnections.getText().toString() + "<br/>");
 		}
-		//lblConnections.setText(lblConnections.getText().toString() + "</html>");
 		
 		for(int i = 0; i < 20; i++) {
 			System.out.printf("%-14s : ", cities[i]);
@@ -265,7 +259,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		}
 	}
 	
-	public Queue BFS() {
+	public void BFS() {
 		bfsPanel.removeAll();
 		Queue goalPath = new LinkedList();
 		Queue frontier = new LinkedList();
@@ -278,13 +272,11 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		
 		
 		String current = selected;
-		//visited.add(current);
-		//goalPath.add(current);
 		frontier.add(current);
 		family.add(new node("", current));
 		
 		if(current.equalsIgnoreCase("Bucharest")) {
-			return goalPath;
+			//return goalPath;
 		}else {
 			while(!frontier.isEmpty()) {
 				System.out.println("Front " + current);
@@ -391,9 +383,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 						bfsPanel.add(lblScore);
 						
 						bfsPanel.repaint();
-						
-						
-						return goalPath;
+						break;
 					}
 					steps++;
 					for(int i = 0; i < 20; i++) {
@@ -407,13 +397,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 					goalPath.add(current);
 				}
 			}
-		}
-		System.out.println("MY VISITS:");
-		while(!visited.isEmpty())
-			System.out.println(visited.toString());
-		System.out.println("Stop");
-		return goalPath;
-		
+		}	
 		
 	}
 	
