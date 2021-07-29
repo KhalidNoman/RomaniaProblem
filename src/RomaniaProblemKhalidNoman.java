@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTabbedPane;
 import javax.swing.JComboBox;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Stack;
 import java.awt.event.ActionEvent;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -94,9 +96,11 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		
 		dfsPanel = new JPanel();
 		tabbedPane.addTab("Depth-First Search", null, dfsPanel, null);
+		dfsPanel.setLayout(null);
 		
 		idsPanel = new JPanel();
 		tabbedPane.addTab("Iterative-Deepening Search", null, idsPanel, null);
+		idsPanel.setLayout(null);
 		
 		JComboBox selectDrop = new JComboBox(cities);
 		selectDrop.setBounds(10, 10, 200, 20);
@@ -111,6 +115,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 				BFS();
 				DFS();
 				IDS();
+				//IDS2();
 			}
 		});
 		goBtn.setBounds(250, 10, 89, 23);
@@ -252,6 +257,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 	public class node{
 		String parent;
 		String child;
+		int depth = 0;
 		
 		public node(String p, String c) {
 			parent = p;
@@ -273,7 +279,7 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 		
 		String current = selected;
 		frontier.add(current);
-		family.add(new node("", current));
+		family.add(new node("", selected));
 		
 		if(current.equalsIgnoreCase("Bucharest")) {
 			//return goalPath;
@@ -282,7 +288,8 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 				System.out.println("Front " + current);
 				current = frontier.remove().toString();
 
-				if(!visited.contains(current) && !frontier.contains(current)) {
+				//if(!visited.contains(current) && !frontier.contains(current)) {
+				if(!visited.contains(current)) {
 					if(current.equalsIgnoreCase("Bucharest")) {
 						goalPath.add(current);
 						visited.add(current);
@@ -402,10 +409,388 @@ public class RomaniaProblemKhalidNoman extends JFrame {
 	}
 	
 	public void DFS() {
+		dfsPanel.removeAll();
+		Queue goalPath = new LinkedList();
+		Stack frontier = new Stack();
+		int steps = 0;
+		int score = 0;
+		
+		ArrayList<String> visited = new ArrayList<String>();
+		ArrayList<node> family = new ArrayList<node>();
+		String parent;
+		
+		
+		String current = selected;
+		frontier.add(current);
+		family.add(new node("", current));
+		
+		if(current.equalsIgnoreCase("Bucharest")) {
+			//return goalPath;
+		}else {
+			while(!frontier.isEmpty()) {
+				System.out.println("Front " + current);
+				current = frontier.pop().toString();
+
+				//if(!visited.contains(current) && !frontier.contains(current)) {
+				if(!visited.contains(current)) {
+					if(current.equalsIgnoreCase("Bucharest")) {
+						goalPath.add(current);
+						visited.add(current);
+						
+						System.out.println("\nMY PATH:");
+						while(!goalPath.isEmpty())
+							System.out.println(goalPath.remove().toString());
+						
+						JLabel lblVisit = new JLabel("Visited cities in order visited: ");
+						lblVisit.setVerticalAlignment(SwingConstants.TOP);
+						lblVisit.setHorizontalAlignment(SwingConstants.LEFT);
+						lblVisit.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblVisit.setBounds(10, 10, 970, 870);
+						dfsPanel.add(lblVisit);
+						
+						
+						
+						System.out.println("\nMY VISITS:");
+						System.out.println(visited.toString());
+						
+						
+						JTextArea lblVisit2 = new JTextArea(visited.get(0));
+						lblVisit2.setBackground(getBackground());
+						lblVisit2.setLineWrap(true);
+						lblVisit2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+						lblVisit2.setBounds(10, 60, 970, 150);
+						for(int i = 1; i < visited.size(); i++)
+							lblVisit2.setText(lblVisit2.getText().toString() + " -> " + visited.get(i));
+						dfsPanel.add(lblVisit2);
+						
+						dfsPanel.repaint();
+						
+						System.out.println("Goal path: ");
+						int index = 0;
+						for(int i = 0; i < family.size(); i++) {
+							if(family.get(i).child.equalsIgnoreCase("Bucharest"))
+								index = i;
+						}
+						int i = index;
+						int j = 0;
+						ArrayList<String> myList = new ArrayList<String>();
+						myList.add(family.get(index).child);
+						while(i != 0) {
+							if(family.get(i).parent.equalsIgnoreCase(family.get(j).child)) {
+								i = j; j = 0;
+								myList.add(family.get(i).child);
+							}
+							else j++;
+						}
+						
+						JLabel lblGoal = new JLabel("Straight path from origin to goal: ");
+						lblGoal.setVerticalAlignment(SwingConstants.TOP);
+						lblGoal.setHorizontalAlignment(SwingConstants.LEFT);
+						lblGoal.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblGoal.setBounds(10, 250, 970, 50);
+						dfsPanel.add(lblGoal);
+						
+						JTextArea lblGoal2 = new JTextArea();
+						lblGoal2.setBackground(getBackground());
+						lblGoal2.setLineWrap(true);
+						lblGoal2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+						lblGoal2.setBounds(10, 300, 970, 150);
+						
+						for(int x = 0; x < myList.size()-1; x++) {
+							int from = 0, to = 0;
+							for(int y = 0; y < cities.length; y++) {
+								if(myList.get(x).equalsIgnoreCase(cities[y]))
+									from = y;
+								else if(myList.get(x+1).equalsIgnoreCase(cities[y]))
+									to = y;	
+							}
+							score = score + adjMatrix[from][to];
+						}
+						
+						for(int x = myList.size()-1; x >= 0; x--) {
+							if(myList.get(x).equalsIgnoreCase("Bucharest")) {
+								System.out.println(myList.get(x));
+								lblGoal2.setText(lblGoal2.getText().toString() + myList.get(x));
+							}else {
+								System.out.print(myList.get(x) + " -> ");
+								lblGoal2.setText(lblGoal2.getText().toString() + myList.get(x) + " -> ");
+							}
+						}
+						dfsPanel.add(lblGoal2);
+						
+						JLabel lblSteps = new JLabel("Steps: " + steps);
+						lblSteps.setVerticalAlignment(SwingConstants.TOP);
+						lblSteps.setHorizontalAlignment(SwingConstants.LEFT);
+						lblSteps.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblSteps.setBounds(10, 500, 970, 50);
+						dfsPanel.add(lblSteps);
+						
+						JLabel lblScore = new JLabel("Score: " + score);
+						lblScore.setVerticalAlignment(SwingConstants.TOP);
+						lblScore.setHorizontalAlignment(SwingConstants.LEFT);
+						lblScore.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblScore.setBounds(10, 600, 970, 50);
+						dfsPanel.add(lblScore);
+						
+						dfsPanel.repaint();
+						break;
+					}
+					steps++;
+					for(int i = 0; i < 20; i++) {
+						if(adjMatrix[Arrays.asList(cities).indexOf(current)][i] > 0  && !visited.contains(cities[i])) {
+							family.add(new node(current, cities[i]));
+							System.out.println("Adding " + cities[i] + " parent: " + current);
+							frontier.add(cities[i]);
+						}
+					}
+					visited.add(current);
+					goalPath.add(current);
+				}
+			}
+		}	
 		
 	}
 	
 	public void IDS() {
+		idsPanel.removeAll();
+		Queue goalPath = new LinkedList();
+		Stack frontier = new Stack();
+		int steps = 0;
+		int score = 0;
 		
+		ArrayList<String> visited = new ArrayList<String>();
+		ArrayList<String> currVisits = new ArrayList<String>();
+		ArrayList<node> family = new ArrayList<node>();
+		String parent;
+		int depth = 1;
+		
+		
+		String current = selected;
+		frontier.add(current);
+		family.add(new node("", current));
+		
+		if(current.equalsIgnoreCase("Bucharest")) {
+			//return goalPath;
+		}else {
+			for(Integer limit = 0; limit < 100; limit++) {
+				System.out.println("Limit: " + limit);
+				frontier.removeAllElements();		
+				frontier.add(selected);
+				currVisits.clear();
+				family.clear();
+				family.add(new node("", selected));
+			while(!frontier.isEmpty()) {
+				System.out.println(frontier.toString());
+				System.out.println("inner");
+				current = frontier.pop().toString();
+				System.out.println("Front: " + current);
+				
+				
+				depth = 1;
+				
+				node temp= new node("", "");
+				for(int x = 0; x < family.size(); x++) {
+					//System.out.println("bad");
+					if(current.equalsIgnoreCase(family.get(x).child))
+						temp = family.get(x);
+					//System.out.println("bad2");
+				}
+				
+				while(!temp.child.equalsIgnoreCase(selected) && !temp.parent.equalsIgnoreCase("") && depth <20) {
+					//System.out.println(family.size());
+					for(int x = 0; x < family.size(); x++) {
+						System.out.println(temp.parent + " " + temp.child + " " + family.get(x).parent + family.get(x).child);
+						if(temp.parent.equalsIgnoreCase(family.get(x).child)) {
+							temp = family.get(x);
+							System.out.println(temp.parent + " parent of " + family.get(x).child + " depth " + depth);
+						}
+					}
+					depth++;
+				}
+			if(depth <= limit) {
+				System.out.println("Here " + currVisits.toString());
+				
+				//if(!visited.contains(current) && !frontier.contains(current)) {
+				if(!currVisits.contains(current)) {
+					if(current.equalsIgnoreCase("Bucharest")) {
+						goalPath.add(current);
+						visited.add(current);
+						currVisits.add(current);
+						
+						System.out.println("\nMY PATH:");
+						while(!goalPath.isEmpty())
+							System.out.println(goalPath.remove().toString());
+						
+						JLabel lblVisit = new JLabel("Visited cities in order visited: ");
+						lblVisit.setVerticalAlignment(SwingConstants.TOP);
+						lblVisit.setHorizontalAlignment(SwingConstants.LEFT);
+						lblVisit.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblVisit.setBounds(10, 10, 970, 870);
+						idsPanel.add(lblVisit);
+						
+						
+						
+						System.out.println("\nMY VISITS:");
+						System.out.println(visited.toString());
+						
+						
+						JTextArea lblVisit2 = new JTextArea(visited.get(0));
+						lblVisit2.setBackground(getBackground());
+						lblVisit2.setLineWrap(true);
+						lblVisit2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+						lblVisit2.setBounds(10, 60, 970, 150);
+						for(int i = 1; i < visited.size(); i++)
+							lblVisit2.setText(lblVisit2.getText().toString() + " -> " + visited.get(i));
+						idsPanel.add(lblVisit2);
+						
+						idsPanel.repaint();
+						
+						System.out.println("Goal path: ");
+						int index = 0;
+						for(int i = 0; i < family.size(); i++) {
+							if(family.get(i).child.equalsIgnoreCase("Bucharest"))
+								index = i;
+						}
+						int i = index;
+						int j = 0;
+						ArrayList<String> myList = new ArrayList<String>();
+						myList.add(family.get(index).child);
+						while(i != 0) {
+							if(family.get(i).parent.equalsIgnoreCase(family.get(j).child)) {
+								i = j; j = 0;
+								myList.add(family.get(i).child);
+							}
+							else j++;
+						}
+						
+						JLabel lblGoal = new JLabel("Straight path from origin to goal: ");
+						lblGoal.setVerticalAlignment(SwingConstants.TOP);
+						lblGoal.setHorizontalAlignment(SwingConstants.LEFT);
+						lblGoal.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblGoal.setBounds(10, 250, 970, 50);
+						idsPanel.add(lblGoal);
+						
+						JTextArea lblGoal2 = new JTextArea();
+						lblGoal2.setBackground(getBackground());
+						lblGoal2.setLineWrap(true);
+						//lblGoal2.enable(false);
+						lblGoal2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+						lblGoal2.setBounds(10, 300, 970, 150);
+						
+						for(int x = 0; x < myList.size()-1; x++) {
+							int from = 0, to = 0;
+							for(int y = 0; y < cities.length; y++) {
+								if(myList.get(x).equalsIgnoreCase(cities[y]))
+									from = y;
+								else if(myList.get(x+1).equalsIgnoreCase(cities[y]))
+									to = y;	
+							}
+							score = score + adjMatrix[from][to];
+						}
+						
+						for(int x = myList.size()-1; x >= 0; x--) {
+							if(myList.get(x).equalsIgnoreCase("Bucharest")) {
+								System.out.println(myList.get(x));
+								lblGoal2.setText(lblGoal2.getText().toString() + myList.get(x));
+							}else {
+								System.out.print(myList.get(x) + " -> ");
+								lblGoal2.setText(lblGoal2.getText().toString() + myList.get(x) + " -> ");
+							}
+						}
+						idsPanel.add(lblGoal2);
+						
+						JLabel lblSteps = new JLabel("Steps: " + steps);
+						lblSteps.setVerticalAlignment(SwingConstants.TOP);
+						lblSteps.setHorizontalAlignment(SwingConstants.LEFT);
+						lblSteps.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblSteps.setBounds(10, 500, 970, 50);
+						idsPanel.add(lblSteps);
+						
+						JLabel lblScore = new JLabel("Score: " + score);
+						lblScore.setVerticalAlignment(SwingConstants.TOP);
+						lblScore.setHorizontalAlignment(SwingConstants.LEFT);
+						lblScore.setFont(new Font("Tahoma", Font.PLAIN, 30));
+						lblScore.setBounds(10, 600, 970, 50);
+						idsPanel.add(lblScore);
+						
+						idsPanel.repaint();
+						
+
+						return;
+					}
+				}
+					steps++;
+					for(int i = 0; i < 20; i++) {
+						if(adjMatrix[Arrays.asList(cities).indexOf(current)][i] > 0 && !currVisits.contains(cities[i]) && !frontier.contains(cities[i])) {
+							family.add(new node(current, cities[i]));
+							System.out.println("Adding " + cities[i] + " parent: " + current + " depth: " + depth);
+							frontier.add(cities[i]);
+						}
+					}
+					
+					visited.add(current.concat(limit.toString()));
+					currVisits.add(current);
+					goalPath.add(current);
+				}
+			}
+			}
+		}	
+	
 	}
+	
+	//Unused different attempt
+	public void IDS2() {
+		idsPanel.removeAll();
+		Queue goalPath = new LinkedList();
+		Stack frontier = new Stack();
+		int steps = 0;
+		int score = 0;
+		
+		ArrayList<String> visited = new ArrayList<String>();
+		ArrayList<String> currVisits = new ArrayList<String>();
+		ArrayList<node> family = new ArrayList<node>();
+		String parent;
+		Integer depth = 1;
+		
+		String current = selected;
+		frontier.add(current);
+		family.add(new node("", current));
+		int limit = 0;
+		while(!current.equalsIgnoreCase("Bucharest")) {
+			current = frontier.pop().toString();
+			visited.add(current.concat(depth.toString()));
+			
+			node temp= new node("", "");
+			for(int x = 0; x < family.size(); x++) {
+				if(current.equalsIgnoreCase(family.get(x).child))
+					temp = family.get(x);
+			}
+			
+			while(!temp.child.equalsIgnoreCase(selected) && !temp.parent.equalsIgnoreCase("") && depth <20) {
+				for(int x = 0; x < family.size(); x++) {
+					System.out.println(temp.parent + " " + temp.child + " " + family.get(x).parent + family.get(x).child);
+					if(temp.parent.equalsIgnoreCase(family.get(x).child)) {
+						temp = family.get(x);
+						System.out.println(temp.parent + " parent of " + family.get(x).child + " depth " + depth);
+					}
+				}
+				depth++;
+			}
+			
+			if(depth < limit) {
+				for(int i = 0; i < 20; i++) {
+					if(adjMatrix[Arrays.asList(cities).indexOf(current)][i] > 0 && !visited.contains(cities[i])) {
+						family.add(new node(current, cities[i]));
+						frontier.add(cities[i]);
+					}
+	
+				}
+				limit++;
+				System.out.println(frontier.toString());
+				if(visited.contains("Bucharest"))
+					break;
+			}
+		}
+	}
+
 }
